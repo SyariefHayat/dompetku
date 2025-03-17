@@ -136,7 +136,7 @@ const Receipt = () => {
                     </Button>
                 </CardFooter>
             </Card>
-            <Button className="w-[400px] p-6" onClick={() => navigate("/dashboard/transfer")}>
+            <Button className="w-[400px] p-6" onClick={() => navigate("/dashboard/payment")}>
                 <ArrowLeft /> Kembali
             </Button>
         </div>

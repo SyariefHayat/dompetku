@@ -64,7 +64,7 @@ const router = createBrowserRouter([
         element: <PaymentSetUp />
     },
     {
-        path: "/dashboard/transfer/receipt",
+        path: "/dashboard/payment/receipt",
         element: <Receipt />
     },
     {
