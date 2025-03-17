@@ -80,7 +80,7 @@ const MidtransTransaction = async (req, res) => {
             },
             customer_details: { email: email },
             callbacks: {
-                finish: "http://localhost:5173/dashboard/transfer/receipt"
+                finish: "http://localhost:5173/dashboard/payment/receipt"
             }
         };
 
