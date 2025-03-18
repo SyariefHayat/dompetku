@@ -32,16 +32,17 @@ const Transfer = () => {
         }
     }, [emailStorage, tokenStorage])
 
+    const totalPlansBalance = userData?.plans?.reduce((total, plan) => total + (plan.amount || 0), 0) || 0;
+    const totalBalance = (userData?.balance || 0) + totalPlansBalance;
+
     return (
         <DashboardLayout>
             <div className="w-full h-full flex flex-col gap-5 px-5 pb-5">
                 <div className="w-full md:w-1/2 flex items-center justify-between font-medium bg-gray-100 py-1 px-2 rounded-md shadow-sm">
                     <p>Total Saldo</p>
                     <div className="flex items-center justify-between text-lg gap-3">
-                        {isEyeOpen && userData ? (
-                            <p>Rp {userData?.balance.toLocaleString("id-ID")}</p>
-                        ) : (
-                            <p>Rp ------</p>
+                        {userData && (
+                            <p>Rp {isEyeOpen ? totalBalance.toLocaleString("id-ID") : "------"}</p>
                         )}
                         <button 
                             onClick={() => setIsEyeOpen((prev) => !prev)} 

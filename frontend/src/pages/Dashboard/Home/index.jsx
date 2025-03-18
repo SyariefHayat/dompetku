@@ -1,4 +1,5 @@
 import { useAtom } from 'jotai';
+import { Eye, EyeOff } from 'lucide-react';
 import React, { useEffect, useState, useMemo } from 'react';
 import { BarChart, Bar, XAxis, CartesianGrid } from 'recharts';
 
@@ -49,6 +50,7 @@ const chartConfig = {
 const Dashboard = () => {
     const [emailStorage] = useAtom(emailStorageAtom);
     const [tokenStorage] = useAtom(tokenStorageAtom);
+    const [isEyeOpen, setIsEyeOpen] = useState(true);
 
     const [userData, setUserData] = useState("");
     const [activeChart, setActiveChart] = useState("pemasukan");
@@ -124,6 +126,9 @@ const Dashboard = () => {
         pengeluaran: chartData.reduce((acc, curr) => acc + curr.pengeluaran, 0),
     }), [chartData]);
 
+    const totalPlansBalance = userData?.plans?.reduce((total, plan) => total + (plan.amount || 0), 0) || 0;
+    const totalBalance = (userData?.balance || 0) + totalPlansBalance;
+
     return (
         <DashboardLayout>
             <div className="w-full h-full flex flex-col px-5 pb-5">
@@ -131,11 +136,21 @@ const Dashboard = () => {
                     <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                         <Card>
                             <CardHeader>
-                                <CardTitle>Kantong Utama</CardTitle>
-                                <CardDescription>Kantong utama untuk menyimpan dan mengelola keuangan Anda dengan mudah.</CardDescription>
+                                <CardTitle>Total Saldo</CardTitle>
+                                <CardDescription>Saldo utama yang mencakup dana di kantong utama dan rencana keuangan Anda.</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <p>Rp {userData?.balance?.toLocaleString("id-ID") ?? 0}</p>
+                                <div className="flex items-center justify-between text-lg gap-3">
+                                    {userData && (
+                                        <p>Rp {isEyeOpen ? totalBalance.toLocaleString("id-ID") : "------"}</p>
+                                    )}
+                                    <button 
+                                        onClick={() => setIsEyeOpen((prev) => !prev)} 
+                                        className="p-2 rounded-md hover:bg-gray-200 transition"
+                                    >
+                                        {isEyeOpen ? <Eye className="cursor-pointer" /> : <EyeOff className="cursor-pointer" />}
+                                    </button>
+                                </div>
                             </CardContent>
                         </Card>
                         
