@@ -245,25 +245,32 @@ const GetNote = async (req, res) => {
 
 const UpdateNote = async (req, res) => {
     const noteId = req.params.id;
-    const data = req.body;
+    const { subTaskId, isChecked } = req.body;
 
     try {
-        if (!noteId || !data) return ERROR(res, 400, "Data not found");
+        if (!noteId || !subTaskId || isChecked === undefined) {
+            return ERROR(res, 400, "Invalid request: Missing data");
+        }
 
         const user = await User.findById(req.user._id);
         if (!user) return ERROR(res, 404, "User not found");
 
-        const note = user.notes.id(noteId);
-        if (!note) return ERROR(res, 404, "Notes not found");
+        const note = await user.notes.id(noteId);
+        if (!note) return ERROR(res, 404, "Note not found");
 
-        Object.assign(note, data);
+        const subTask = note.subTasks.find(st => st._id.toString() === subTaskId);
+        if (!subTask) return ERROR(res, 404, "Subtask not found");
 
+        // Perbarui nilai isChecked
+        subTask.isChecked = isChecked;
+
+        // Simpan perubahan
         await user.save();
 
-        return SUCCESS(res, 200, note, "Success updated data");
+        return SUCCESS(res, 200, subTask, "Successfully updated subtask");
     } catch (error) {
         console.error(error);
-        return ERROR(res, 500, "Error updating data");
+        return ERROR(res, 500, "Error updating subtask");
     }
 };
 

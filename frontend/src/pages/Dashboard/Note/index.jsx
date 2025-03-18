@@ -34,31 +34,41 @@ import { formatDateFull } from '@/utilities/formatDate';
 import { getDataUser } from '@/services/data/getDataUser';
 import { emailStorageAtom, tokenStorageAtom } from '@/jotai/atoms';
 import DashboardLayout from '@/components/Layouts/DashboardLayout';
+import { apiInstanceExpress } from '@/services/express/apiInstance';
 
 const Notes = () => {
     const [notesData, setNotesData] = useState(null);
     const [taskData, setTaskData] = useState(null);
     const [listData, setListData] = useState(null);
+    const [isFinish, setIsFinish] = useState(false);
 
     const [emailStorage] = useAtom(emailStorageAtom);
     const [tokenStorage] = useAtom(tokenStorageAtom);
 
     const [checkedTasks, setCheckedTasks] = useState({});
 
-    const handleCheckboxChange = (taskId, hasSubTasks = false, subTasks = []) => {
-        setCheckedTasks((prevChecked) => {
-            const isChecked = !prevChecked[taskId]; // Toggle checkbox utama
-            const updatedChecked = { ...prevChecked, [taskId]: isChecked };
-    
-            // Jika checkbox utama dicentang dan memiliki sub-tugas, centang semua sub-tugas
-            if (hasSubTasks) {
-                subTasks.forEach((subTask, index) => {
-                    updatedChecked[`${taskId}-sub-${index}`] = isChecked;
-                });
+    const handleCheckboxChange = async (noteId, subTaskId, isChecked) => {
+        try {
+            const response = await apiInstanceExpress.put(`notes/${emailStorage}/${tokenStorage}/${noteId}`, {
+                email: emailStorage,
+                token: tokenStorage,
+                subTaskId,
+                isChecked: !isChecked,
+            })
+
+            if (response.status === 200) {
+                setCheckedTasks((prevChecked) => ({
+                    ...prevChecked,
+                    [subTaskId]: !isChecked
+                }));
             }
-    
-            return updatedChecked;
-        });
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const isAllSubtasksChecked = (subTasks) => {
+        return subTasks?.every(subTask => subTask.isChecked);
     };
 
     useEffect(() => {
@@ -83,7 +93,7 @@ const Notes = () => {
                 console.error("Error fetching user notes:", error);
             });
         }
-    }, [emailStorage, tokenStorage]); 
+    }, [emailStorage, tokenStorage, taskData]); 
 
     return (
         <DashboardLayout>
@@ -145,40 +155,51 @@ const Notes = () => {
                                 {taskData && (
                                     <EachUtils 
                                         of={taskData}
-                                        render={(item, index) => (
-                                            <Card key={index} className={`flex flex-col justify-between ${item.color}`}>
-                                                <CardHeader>
-                                                    <CardTitle className="flex items-center gap-3">
-                                                        <Checkbox 
-                                                            checked={checkedTasks[item._id] || false} 
-                                                            onCheckedChange={() => handleCheckboxChange(item._id, true, item.subTasks)} 
-                                                        />
-                                                        <p className="line-clamp-1">{item.title}</p>
-                                                    </CardTitle>
-                                                </CardHeader>
+                                        render={(item, index) => {
+                                            const allChecked = isAllSubtasksChecked(item.subTasks);
 
-                                                <CardContent className="w-full h-full flex flex-col items-start space-y-2">
-                                                    <EachUtils 
-                                                        of={item.subTasks}
-                                                        render={(subItem, subIndex) => (
-                                                            <div key={subIndex} className="w-full pl-7 flex items-center gap-3">
-                                                                <Checkbox 
-                                                                    checked={checkedTasks[`${item._id}-sub-${subIndex}`] || false} 
-                                                                    onCheckedChange={() => handleCheckboxChange(`${item._id}-sub-${subIndex}`)} 
-                                                                />
-                                                                <div>
-                                                                    <p>{subItem.text}</p>
+                                            return (
+                                                <Card key={index} className={`flex flex-col justify-between ${item.color}`}>
+                                                    <CardHeader>
+                                                        <CardTitle className="flex items-center gap-3">
+                                                            <Checkbox 
+                                                                checked={allChecked}
+                                                                onCheckedChange={() => {
+                                                                    const newChecked = !allChecked;
+                                                                    item.subTasks.forEach(sub => 
+                                                                        handleCheckboxChange(item._id, sub._id, !newChecked)
+                                                                    );
+                                                                }}
+                                                                // checked={checkedTasks[item._id] || false} 
+                                                                // onCheckedChange={() => handleCheckboxChange(item._id, true, item.subTasks)} 
+                                                            />
+                                                            <p className="line-clamp-1">{item.title}</p>
+                                                        </CardTitle>
+                                                    </CardHeader>
+
+                                                    <CardContent className="w-full h-full flex flex-col items-start space-y-2">
+                                                        <EachUtils 
+                                                            of={item.subTasks}
+                                                            render={(subItem, subIndex) => (
+                                                                <div key={subIndex} className="w-full pl-7 flex items-center gap-3">
+                                                                    <Checkbox 
+                                                                        checked={subItem.isChecked}
+                                                                        onCheckedChange={() => handleCheckboxChange(item._id, subItem._id, subItem.isChecked)} 
+                                                                    />
+                                                                    <div>
+                                                                        <p>{subItem.text}</p>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        )}
-                                                    />
-                                                </CardContent>
+                                                            )}
+                                                        />
+                                                    </CardContent>
 
-                                                <CardFooter>
-                                                    <p>{formatDateFull(item.createdAt)}</p>
-                                                </CardFooter>
-                                            </Card>
-                                        )}
+                                                    <CardFooter>
+                                                        <p>{formatDateFull(item.createdAt)}</p>
+                                                    </CardFooter>
+                                                </Card>
+                                            )
+                                        }}
                                     />
                                 )}
                             </div>
@@ -229,3 +250,19 @@ const Notes = () => {
 }
 
 export default Notes
+
+    // const handleCheckboxChange = (taskId, hasSubTasks = false, subTasks = []) => {
+    //     setCheckedTasks((prevChecked) => {
+    //         const isChecked = !prevChecked[taskId]; // Toggle checkbox utama
+    //         const updatedChecked = { ...prevChecked, [taskId]: isChecked };
+    
+    //         // Jika checkbox utama dicentang dan memiliki sub-tugas, centang semua sub-tugas
+    //         if (hasSubTasks) {
+    //             subTasks.forEach((subTask, index) => {
+    //                 updatedChecked[`${taskId}-sub-${index}`] = isChecked;
+    //             });
+    //         }
+    
+    //         return updatedChecked;
+    //     });
+    // };

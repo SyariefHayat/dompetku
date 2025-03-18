@@ -158,7 +158,7 @@ const Dashboard = () => {
                         </Card>
                     </div>
                     
-                    <Card className="min-h-[50vh] flex-1 rounded-xl bg-muted/50 md:min-h-min">
+                    <Card className="min-h-[50vh] flex-1 rounded-xl md:min-h-min">
                         <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
                             <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
                                 <CardTitle>Statistik Keuangan</CardTitle>
@@ -184,6 +184,7 @@ const Dashboard = () => {
                             <ChartContainer config={chartConfig} className="aspect-auto h-48 w-full">
                                 <BarChart
                                     accessibilityLayer
+                                    key={activeChart}
                                     data={displayedChartData}
                                 >
                                     <CartesianGrid vertical={false} />
