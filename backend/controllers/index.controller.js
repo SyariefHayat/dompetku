@@ -110,36 +110,37 @@ const MidtransWebHook = async (req, res) => {
     const { order_id, transaction_status, payment_type, va_numbers, gross_amount, issuer } = req.body;
 
     try {
-        if (!order_id || !transaction_status) return ERROR(res, 400, "Data not found");
+        // if (!order_id || !transaction_status) return ERROR(res, 400, "Data not found");
 
-        const updateFields = {
-            $set: {
-                "transactions.$.paymentType": payment_type,
-                "transactions.$.status": transaction_status,
-            },
-        };
+        // const updateFields = {
+        //     $set: {
+        //         "transactions.$.paymentType": payment_type,
+        //         "transactions.$.status": transaction_status,
+        //     },
+        // };
 
-        if (payment_type === "bank" || payment_type === "bank_transfer") {
-            updateFields.$set["transactions.$.vaNumbers"] = va_numbers;
-        } else {
-            updateFields.$set["transactions.$.issuer"] = issuer;
-        }
+        // if (payment_type === "bank" || payment_type === "bank_transfer") {
+        //     updateFields.$set["transactions.$.vaNumbers"] = va_numbers;
+        // } else {
+        //     updateFields.$set["transactions.$.issuer"] = issuer;
+        // }
 
-        // Update transaksi di dalam array transactions pada user
-        let updatedUser = await User.findOneAndUpdate(
-            { "transactions.orderId": order_id },
-            { 
-                ...updateFields,
-                ...(transaction_status === "settlement" || transaction_status === "capture"
-                    ? { $inc: { balance: parseFloat(gross_amount) } }
-                    : {})
-            },
-            { new: true }
-        );
+        // // Update transaksi di dalam array transactions pada user
+        // let updatedUser = await User.findOneAndUpdate(
+        //     { "transactions.orderId": order_id },
+        //     { 
+        //         ...updateFields,
+        //         ...(transaction_status === "settlement" || transaction_status === "capture"
+        //             ? { $inc: { balance: parseFloat(gross_amount) } }
+        //             : {})
+        //     },
+        //     { new: true }
+        // );
 
-        if (!updatedUser) return ERROR(res, 404, "Transaction not found");
+        // if (!updatedUser) return ERROR(res, 404, "Transaction not found");
 
-        return SUCCESS(res, 200, updatedUser, "Success updated data");
+        // return SUCCESS(res, 200, updatedUser, "Success updated data");
+        return SUCCESS(res, 200, null, "Success updated data");
     } catch (error) {
         console.error(error);
         return ERROR(res, 500, "Error updating data");
