@@ -37,44 +37,6 @@ import { useAtom } from "jotai";
 import { emailStorageAtom, tokenStorageAtom } from "@/jotai/atoms";
 import { getDataUser } from "@/services/data/getDataUser";
 
-// const dummyTransactions = [
-//     {
-//         id: "1",
-//         _id: "trxn001",
-//         category: "Makanan",
-//         amount: 50000,
-//         created_at: "2024-03-10T12:30:00Z",
-//     },
-//     {
-//         id: "2",
-//         _id: "trxn002",
-//         category: "Transportasi",
-//         amount: 20000,
-//         created_at: "2024-03-11T08:15:00Z",
-//     },
-//     {
-//         id: "3",
-//         _id: "trxn003",
-//         category: "Belanja",
-//         amount: 150000,
-//         created_at: "2024-03-12T14:45:00Z",
-//     },
-//     {
-//         id: "4",
-//         _id: "trxn004",
-//         category: "Hiburan",
-//         amount: 75000,
-//         created_at: "2024-03-13T19:00:00Z",
-//     },
-//     {
-//         id: "5",
-//         _id: "trxn005",
-//         category: "Kesehatan",
-//         amount: 100000,
-//         created_at: "2024-03-14T10:20:00Z",
-//     }
-// ];
-
 // Kolom Tabel
 const columns = [
     {
@@ -100,12 +62,20 @@ const columns = [
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div className="capitalize ml-4">{row.getValue("createdAt")}</div>,
+        cell: ({ row }) => {
+            const date = new Date(row.getValue("createdAt"));
+            const formattedDate = date.toLocaleDateString("id-ID", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+            });
+            return <div className="capitalize ml-4">{formattedDate}</div>;
+        },    
     },
     {
-        accessorKey: "method",
+        accessorKey: "paymentType",
         header: "Metode",
-        cell: ({ row }) => <div className="capitalize">{row.getValue("method")}</div>,
+        cell: ({ row }) => <div className="capitalize">{row.getValue("paymentType")}</div>,
     },
     {
         accessorKey: "amount",
@@ -117,7 +87,8 @@ const columns = [
         ),
         cell: ({ row }) => {
             const amount = parseFloat(row.getValue("amount"));
-            return <div className="ml-4 font-medium">Rp {amount.toFixed(2)}</div>;
+            const formattedAmount = amount.toLocaleString("id-Id")
+            return <div className="ml-4 font-medium">Rp {formattedAmount}</div>;
         },
     },
     {
