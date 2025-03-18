@@ -36,7 +36,6 @@ const Receipt = () => {
             .then((result) => {
                 if (result?.data?.transactions) {
                     setUserTransactions(result.data.transactions[0]);
-                    console.log(result.data.transactions[0]);
                 }
             })
             .catch((error) => console.error("Error fetching transactions:", error));
@@ -47,7 +46,7 @@ const Receipt = () => {
         navigator.share({
             title: 'Detail Transaksi',
             text: 'Lihat detail transaksi saya',
-            url: window.location.href, // Ganti dengan URL transaksi yang sesuai
+            url: window.location.href,
         })
         .catch((error) => console.error('Error sharing:', error));
         } else {
@@ -56,7 +55,7 @@ const Receipt = () => {
     };
 
     const handleDownloadReceipt = async () => {
-        const cardElement = document.getElementById("receipt-card"); // Pastikan ada id pada Card
+        const cardElement = document.getElementById("receipt-card");
 
         if (!cardElement) return;
 
@@ -66,7 +65,7 @@ const Receipt = () => {
         // Buat PDF
         const pdf = new jsPDF();
         const imgWidth = 190; // Lebar gambar dalam PDF (dalam mm)
-        const imgHeight = (canvas.height * imgWidth) / canvas.width; // Sesuaikan tinggi agar proporsional
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
         pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
         pdf.save("resi-transaksi.pdf"); // Unduh PDF

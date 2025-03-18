@@ -17,7 +17,7 @@ import { emailStorageAtom, tokenStorageAtom } from '@/jotai/atoms';
 
 const Transfer = () => {
     const [userData, setUserData] = useState("");
-    const [isEyeOpen, setIsEyeOpen] = useState(false);
+    const [isEyeOpen, setIsEyeOpen] = useState(true);
 
     const [emailStorage] = useAtom(emailStorageAtom);
     const [tokenStorage] = useAtom(tokenStorageAtom);
@@ -27,7 +27,7 @@ const Transfer = () => {
     useEffect(() => {
         if (emailStorage && tokenStorage) {
             getDataUser(emailStorage, tokenStorage).then((result) => {
-                setUserData(result.data);
+                setUserData(result?.data);
             })
         }
     }, [emailStorage, tokenStorage])
@@ -38,7 +38,7 @@ const Transfer = () => {
                 <div className="w-full md:w-1/2 flex items-center justify-between font-medium bg-gray-100 py-1 px-2 rounded-md shadow-sm">
                     <p>Total Saldo</p>
                     <div className="flex items-center justify-between text-lg gap-3">
-                        {isEyeOpen ? (
+                        {isEyeOpen && userData ? (
                             <p>Rp {userData?.balance.toLocaleString("id-ID")}</p>
                         ) : (
                             <p>Rp ------</p>

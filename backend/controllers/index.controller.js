@@ -116,6 +116,7 @@ const MidtransWebHook = async (req, res) => {
             $set: {
                 "transactions.$.paymentType": payment_type,
                 "transactions.$.status": transaction_status,
+                "transactions.$.transactionType": "income",
             },
         };
 
