@@ -73,7 +73,7 @@ const Receipt = () => {
 
     return (
         <div className="w-full h-screen flex flex-col items-center justify-center gap-3 bg-[#f3f3f3] font-poppins">
-            <Card id="receipt-card" className="w-[400px]">
+            <Card id="receipt-card" className="w-[90%] sm:w-[400px]">
                 <CardHeader>
                     <CardTitle className="text-xl text-muted-foreground line-clamp-2">{userTransactions?.email}</CardTitle>
                     {userTransactions?.paymentType === "bank" || userTransactions?.paymentType === "bank_transfer" ? (
@@ -135,7 +135,7 @@ const Receipt = () => {
                     </Button>
                 </CardFooter>
             </Card>
-            <Button className="w-[400px] p-6" onClick={() => navigate("/dashboard/payment")}>
+            <Button className="w-[90%] sm:w-[400px] p-6" onClick={() => navigate("/dashboard/payment")}>
                 <ArrowLeft /> Kembali
             </Button>
         </div>
